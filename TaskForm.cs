@@ -72,17 +72,12 @@ namespace _2DO
             dtpEndDate.Value = task.EndDate;
             dtpEndTime.Value = task.EndDate;
             cmbPriority.SelectedIndex = (int)task.Priority;
-            cmbCategory.SelectedIndex = task.CategoryId == -1 ? 0 : task.CategoryId;
+            cmbCategory.SelectedIndex = task.CategoryId;
+            notificationMinutesPicker.Value = (int)task.notificationThreshold.TotalMinutes;
         }
         private void ShowTask()
         {
-            //load data
-            txtTitle.Text = task.Title;
-            txtDescription.Text = task.Description;
-            dtpEndDate.Value = task.EndDate;
-            dtpEndTime.Value = task.EndDate;
-            cmbPriority.SelectedIndex = (int)task.Priority;
-            cmbCategory.SelectedIndex = task.CategoryId == -1 ? 0 : task.CategoryId;
+            LoadTaskData();
 
             //setup controls
             txtTitle.ReadOnly = true;
@@ -92,13 +87,20 @@ namespace _2DO
             cmbPriority.Enabled = false;
             cmbCategory.Enabled = false;
             btnSave.Visible = false;
+            notificationMinutesPicker.Enabled = false;
         }
         private void EditTask()
         {
             task.Title = txtTitle.Text;
             task.Description = txtDescription.Text;
             DateTime date = dtpEndDate.Value.Date + dtpEndTime.Value.TimeOfDay;
+            if(task.EndDate != date)
+            {
+                task.notifiedOnThreshold = false;
+                task.notifiedOnEndDate = false;
+            }
             task.EndDate = date;
+            task.notificationThreshold = TimeSpan.FromMinutes((int)notificationMinutesPicker.Value);
             task.Priority = (TaskPriority)cmbPriority.SelectedIndex;
             if(cmbCategory.SelectedIndex == 0 && cmbCategory.SelectedItem == "Empty")
             {
@@ -115,6 +117,9 @@ namespace _2DO
             task.EndDate = date;
             task.Priority = (TaskPriority)cmbPriority.SelectedIndex;
             task.CategoryId = cmbCategory.SelectedIndex;
+            task.notificationThreshold = TimeSpan.FromMinutes((int)notificationMinutesPicker.Value);
+            task.notifiedOnThreshold = false;
+            task.notifiedOnEndDate = false;
         }
         private void TaskForm_Load(object sender, EventArgs e)
         {

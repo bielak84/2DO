@@ -19,6 +19,9 @@ namespace _2DO
         public bool TaskCompleted { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public TimeSpan notificationThreshold { get; set; }
+        public bool notifiedOnThreshold { get; set; }
+        public bool notifiedOnEndDate { get; set; }
         public TaskPriority Priority { get; set; }
         public int CategoryId { get; set; }
         public Task() 

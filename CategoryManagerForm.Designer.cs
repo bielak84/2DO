@@ -108,7 +108,7 @@
             MaximizeBox = false;
             Name = "CategoryManagerForm";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Edit or create category";
+            Text = "Category Manager";
             ResumeLayout(false);
             PerformLayout();
         }

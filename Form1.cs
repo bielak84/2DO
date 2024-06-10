@@ -33,14 +33,23 @@ namespace _2DO
             {
                 DateTime date = DateTime.Now;
                 date = date.AddDays(i);
-                tasks.Add(new Task { Title = "Task " + (i + 1).ToString(), Description = $"Description {i + 1}", TaskCompleted = i % 2 == 0, EndDate = date, CategoryId = r.Next(0,5) });
+                tasks.Add(new Task { 
+                    Title = "Task " + (i + 1).ToString(), 
+                    Description = $"Description {i + 1}", 
+                    TaskCompleted = i % 2 == 0, 
+                    EndDate = date, 
+                    CategoryId = r.Next(0, 5), 
+                    notificationThreshold = TimeSpan.FromMinutes(10),
+                    notifiedOnEndDate = false,
+                    notifiedOnThreshold = false
+                });
             }
             RefreshTaskList();
         }
         private void RefreshCategoryList()
         {
             cmbCategories.Items.Clear();
-            foreach(Category category in categories)
+            foreach (Category category in categories)
             {
                 cmbCategories.Items.Add(category.Name);
             }
@@ -64,7 +73,7 @@ namespace _2DO
                 categories.Add(category);
                 cmbCategories.Items.Add(category.Name);
             }
-            cmbCategories.SelectedIndex = 0; 
+            cmbCategories.SelectedIndex = 0;
         }
         private void RefreshTaskList()
         {
@@ -150,7 +159,32 @@ namespace _2DO
             {
                 //handle other results
             }
-
+        }
+        private void UpdateNotification()
+        {
+            foreach(Task t in tasks)
+            {
+                if (t.TaskCompleted)
+                    continue;
+                TimeSpan timeRemaining = t.EndDate - DateTime.Now;
+                if (timeRemaining > TimeSpan.Zero && timeRemaining <= t.notificationThreshold && !t.notifiedOnThreshold)
+                {
+                    t.notifiedOnThreshold = true;
+                    ShowNotification(t.Title, $"{TaskPriority.GetName(typeof(TaskPriority), (int)t.Priority)} priorit - {timeRemaining.Minutes} minutes left");
+                }
+                if(timeRemaining <= TimeSpan.Zero && !t.notifiedOnEndDate)
+                {
+                    t.notifiedOnEndDate = true;
+                    t.notifiedOnThreshold = true;
+                    ShowNotification(t.Title, $"{TaskPriority.GetName(typeof(TaskPriority), (int)t.Priority)} priorit - Time's up!");
+                }
+            }
+        }
+        private void ShowNotification(string title, string text)
+        {
+            notifyIcon1.BalloonTipTitle = title;
+            notifyIcon1.BalloonTipText = text;
+            notifyIcon1.ShowBalloonTip(3000); // Show for 3 seconds
         }
 
         private void DeleteTask(Task task)
@@ -218,6 +252,7 @@ namespace _2DO
                     taskCard.UpdateTimeLabel();
                 }
             }
+            UpdateNotification();
         }
 
         private void btnCategoryManager_Click(object sender, EventArgs e)

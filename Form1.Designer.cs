@@ -39,6 +39,7 @@
             txtFilter = new TextBox();
             btnNewTask = new Button();
             timer = new System.Windows.Forms.Timer(components);
+            notifyIcon1 = new NotifyIcon(components);
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -154,6 +155,13 @@
             timer.Interval = 1000;
             timer.Tick += timer_Tick;
             // 
+            // notifyIcon1
+            // 
+            notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
+            notifyIcon1.Icon = SystemIcons.Information;
+            notifyIcon1.Text = "notifyIcon1";
+            notifyIcon1.Visible = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -184,5 +192,6 @@
         private Button btnCategoryManager;
         private Label lblCategoryFilter;
         private ComboBox cmbCategories;
+        private NotifyIcon notifyIcon1;
     }
 }
