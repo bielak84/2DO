@@ -112,6 +112,7 @@
             // 
             // flowLayoutPanel2
             // 
+            flowLayoutPanel2.BorderStyle = BorderStyle.None;
             flowLayoutPanel2.Controls.Add(lblTimeLeft);
             flowLayoutPanel2.Controls.Add(lblPriority);
             flowLayoutPanel2.Controls.Add(lblTitle);

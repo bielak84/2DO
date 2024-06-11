@@ -65,7 +65,7 @@ namespace _2DO
             if (Task.TaskCompleted)
             {
                 lblTimeLeft.Text = "[Completed]";
-                flowLayoutPanel2.Width = lblTitle.Width + lblTimeLeft.Width;
+                flowLayoutPanel2.Width = lblTitle.Width + lblTimeLeft.Width + lblPriority.Width;
                 return;
             }
             if (timeRemaining.TotalSeconds > 0)
