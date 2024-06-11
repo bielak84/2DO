@@ -34,6 +34,7 @@
             lblCategoryName = new Label();
             btnCancelEdit = new Button();
             lblCategorySelect = new Label();
+            btnDelete = new Button();
             SuspendLayout();
             // 
             // btnCreateCategory
@@ -93,11 +94,24 @@
             lblCategorySelect.TabIndex = 5;
             lblCategorySelect.Text = "Select category:";
             // 
+            // btnDelete
+            // 
+            btnDelete.Location = new Point(42, 155);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(209, 23);
+            btnDelete.TabIndex = 6;
+            btnDelete.Text = "Delete selected";
+            btnDelete.UseVisualStyleBackColor = true;
+            btnDelete.Click += btnDelete_Click;
+            btnDelete.Visible = false;
+            btnDelete.Enabled = false;
+            // 
             // CategoryManagerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(285, 162);
+            ClientSize = new Size(285, 195);
+            Controls.Add(btnDelete);
             Controls.Add(lblCategorySelect);
             Controls.Add(btnCancelEdit);
             Controls.Add(lblCategoryName);
@@ -121,5 +135,6 @@
         private Label lblCategoryName;
         private Button btnCancelEdit;
         private Label lblCategorySelect;
+        private Button btnDelete;
     }
 }

@@ -15,19 +15,21 @@ namespace _2DO
         bool editMode = false;
         public List<Category> categories;
         Category currentCategory;
-        public CategoryManagerForm(List<Category> categories)
+        private TaskContext _dbcontext;
+        public CategoryManagerForm(List<Category> categories, TaskContext dbcontext)
         {
             InitializeComponent();
             this.categories = categories;
             cmbCategory.Text = "Select category..";
             LoadCategories();
+            _dbcontext = dbcontext;
         }
         private void LoadCategories()
         {
             cmbCategory.Items.Clear();
             foreach (Category category in categories)
             {
-                if(category.Id != 0)
+                if (category.Id != 0)
                     cmbCategory.Items.Add(category.Name);
             }
         }
@@ -50,6 +52,8 @@ namespace _2DO
 
                 currentCategory.Name = txtCategoryName.Text;
                 categories[index] = currentCategory;
+                _dbcontext.Categories.Update(currentCategory);
+                _dbcontext.SaveChanges();
                 LoadCategories();
                 cmbCategory.SelectedIndex = index - 1;
             }
@@ -59,6 +63,8 @@ namespace _2DO
                 currentCategory.Name = txtCategoryName.Text;
                 currentCategory.Id = categories.Count;
                 categories.Add(currentCategory);
+                _dbcontext.Categories.Add(currentCategory);
+                _dbcontext.SaveChanges();
                 LoadCategories();
                 cmbCategory.SelectedIndex = currentCategory.Id - 1;
                 currentCategory = null;
@@ -70,6 +76,8 @@ namespace _2DO
             editMode = true;
             btnCancelEdit.Enabled = true;
             btnCancelEdit.Visible = true;
+            btnDelete.Visible = true;
+            btnDelete.Enabled = true;
             btnCreateCategory.Text = "Save";
             currentCategory = categories.Where(x => x.Name.Equals(cmbCategory.SelectedItem.ToString())).First();
             txtCategoryName.Text = currentCategory.Name;
@@ -80,6 +88,25 @@ namespace _2DO
             editMode = false;
             btnCancelEdit.Enabled = false;
             btnCancelEdit.Visible = false;
+            btnDelete.Visible = false;
+            btnDelete.Enabled = false;
+            cmbCategory.Text = "Select category";
+            btnCreateCategory.Text = "Create";
+            txtCategoryName.Text = "";
+            currentCategory = null;
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            categories.Remove(currentCategory);
+            _dbcontext.Remove(currentCategory);
+            _dbcontext.SaveChanges();
+            LoadCategories();
+            editMode = false;
+            btnCancelEdit.Enabled = false;
+            btnCancelEdit.Visible = false;
+            btnDelete.Visible = false;
+            btnDelete.Enabled = false;
             cmbCategory.Text = "Select category";
             btnCreateCategory.Text = "Create";
             txtCategoryName.Text = "";

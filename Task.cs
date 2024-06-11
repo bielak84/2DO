@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace _2DO
 {
@@ -14,6 +15,7 @@ namespace _2DO
     }
     public class Task
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public bool TaskCompleted { get; set; }
@@ -24,8 +26,5 @@ namespace _2DO
         public bool notifiedOnEndDate { get; set; }
         public TaskPriority Priority { get; set; }
         public int CategoryId { get; set; }
-        public Task() 
-        {
-        }
     }
 }

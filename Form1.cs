@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace _2DO
@@ -8,6 +10,7 @@ namespace _2DO
         private List<Category> categories;
         private FilterConfiguration taskFilter;
         private string defaultSortMode = "A-Z";
+        private TaskContext _dbcontext;
         public Form1()
         {
             InitializeComponent();
@@ -18,9 +21,20 @@ namespace _2DO
             taskFilter.HideCompleted = hideCompletedTasksCheckBox.Checked;
             cmbSort.SelectedIndex = 3;
         }
-
+        //protected override void OnLoad(EventArgs e)
+        
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            this._dbcontext?.Dispose();
+            this._dbcontext = null;
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
+            this._dbcontext = new TaskContext();
+            this._dbcontext.Database.EnsureCreated();
+            this._dbcontext.Tasks.Load<Task>();
+            this._dbcontext.Categories.Load<Category>();
             LoadTasks();
             LoadCategories();
             timer.Start();
@@ -29,21 +43,7 @@ namespace _2DO
         {
             Random r = new Random();
             //dummy data
-            for (int i = 0; i < 25; i++)
-            {
-                DateTime date = DateTime.Now;
-                date = date.AddDays(i);
-                tasks.Add(new Task { 
-                    Title = "Task " + (i + 1).ToString(), 
-                    Description = $"Description {i + 1}", 
-                    TaskCompleted = i % 2 == 0, 
-                    EndDate = date, 
-                    CategoryId = r.Next(0, 5), 
-                    notificationThreshold = TimeSpan.FromMinutes(10),
-                    notifiedOnEndDate = false,
-                    notifiedOnThreshold = false
-                });
-            }
+            tasks = _dbcontext.Tasks.ToList();
             RefreshTaskList();
         }
         private void RefreshCategoryList()
@@ -65,13 +65,10 @@ namespace _2DO
             cmbCategories.Items.Add(category.Name);
 
             //Add custom categories
-            for (int i = 1; i < 5; i++)
+            foreach (var c in _dbcontext.Categories)
             {
-                category = new Category();
-                category.Id = i;
-                category.Name = "Category " + i.ToString();
-                categories.Add(category);
-                cmbCategories.Items.Add(category.Name);
+                categories.Add(c);
+                cmbCategories.Items.Add(c.Name);
             }
             cmbCategories.SelectedIndex = 0;
         }
@@ -151,6 +148,8 @@ namespace _2DO
             TaskForm taskForm = new TaskForm(windowMode: TaskFormWindowMode.Edit, categories: categories, task: task);
             if (taskForm.ShowDialog() == DialogResult.OK)
             {
+                _dbcontext.Tasks.Update(taskForm.task);
+                _dbcontext.SaveChanges();
                 tasks.Remove(task);
                 tasks.Add(taskForm.task);
                 RefreshTaskList();
@@ -189,6 +188,8 @@ namespace _2DO
 
         private void DeleteTask(Task task)
         {
+            _dbcontext.Tasks.Remove(task);
+            _dbcontext.SaveChanges();
             tasks.Remove(task);
             RefreshTaskList();
         }
@@ -196,6 +197,10 @@ namespace _2DO
         private void CopyTask(Task task)
         {
             Task newTask = task;
+            var tMax = _dbcontext.Tasks.FirstOrDefault(newTask => newTask.Id == _dbcontext.Tasks.Max(x => x.Id));
+            newTask.Id = tMax.Id + 1;
+            _dbcontext.Tasks.Add(newTask);
+            _dbcontext.SaveChanges();
             tasks.Add(newTask);
             RefreshTaskList();
         }
@@ -232,6 +237,8 @@ namespace _2DO
             TaskForm taskForm = new TaskForm(windowMode: TaskFormWindowMode.Create, categories: categories);
             if (taskForm.ShowDialog() == DialogResult.OK)
             {
+                _dbcontext.Tasks.Add(taskForm.task);
+                _dbcontext.SaveChanges();
                 tasks.Add(taskForm.task);
                 RefreshTaskList();
             }
@@ -257,7 +264,7 @@ namespace _2DO
 
         private void btnCategoryManager_Click(object sender, EventArgs e)
         {
-            CategoryManagerForm categoryManagerForm = new CategoryManagerForm(categories);
+            CategoryManagerForm categoryManagerForm = new CategoryManagerForm(categories, _dbcontext);
             categoryManagerForm.ShowDialog();
 
             categories = categoryManagerForm.categories;
