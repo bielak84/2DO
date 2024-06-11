@@ -18,6 +18,8 @@ namespace _2DO
         public event Action<Task> DeleteTask;
         public event Action<Task> CopyTask;
         public event Action<Task> ShowTask;
+        public event Action<Task> MarkAsCompleted;
+        public event Action<Task> MarkAsNotCompleted;
 
         public TaskCard(Task task)
         {
@@ -86,12 +88,13 @@ namespace _2DO
 
         private void markAsCompletedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Task.TaskCompleted = true;
+            MarkAsCompleted?.Invoke(Task);
+
         }
 
         private void markAsNotCompletedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Task.TaskCompleted = false;
+            MarkAsNotCompleted?.Invoke(Task);
         }
     }
 }

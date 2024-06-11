@@ -98,11 +98,14 @@ namespace _2DO
                 taskCard.DeleteTask += DeleteTask;
                 taskCard.CopyTask += CopyTask;
                 taskCard.ShowTask += ShowTask;
+                taskCard.MarkAsCompleted += MarkTaskAsCompleted;
+                taskCard.MarkAsNotCompleted += MarkTaskAsNotCompleted;
                 taskCard.Width = flowLayoutPanel.ClientSize.Width - taskCard.Margin.Horizontal;
                 flowLayoutPanel.Controls.Add(taskCard);
             }
             //AdjustTaskCardWidths();
         }
+
         private void AdjustTaskCardWidths()
         {
             foreach (Control control in flowLayoutPanel.Controls)
@@ -120,6 +123,18 @@ namespace _2DO
                 task.Title.ToLower().Contains(searchText.ToLower()) ||
                 task.Description.ToLower().Contains(searchText.ToLower())
             ).ToList();
+        }
+        private void MarkTaskAsCompleted(Task task)
+        {
+            task.TaskCompleted = true;
+            _dbcontext.Tasks.Update(task);
+            _dbcontext.SaveChanges();
+        }
+        private void MarkTaskAsNotCompleted(Task task)
+        {
+            task.TaskCompleted = false;
+            _dbcontext.Tasks.Update(task);
+            _dbcontext.SaveChanges();
         }
         private List<Task> SortTasks(string sortOption, List<Task> tasks)
         {
